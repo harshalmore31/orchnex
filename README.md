@@ -29,23 +29,8 @@ pip install openai google-generativeai
 
 The package isn't ready yet, consider it as an example of our project
 
-```python
-import orchnex_ai  # Assuming you've packaged the core logic as 'orchnex_ai'
-
-# Initialize Orchnex AI
-orchnex = orchnex_ai.OrchnexAI(
-    openai_api_key="YOUR_OPENAI_API_KEY",
-    gemini_api_key="YOUR_GEMINI_API_KEY"
-)
-
-# Get user input
-user_input = input("Enter your prompt: ")
-
-# Run Orchnex AI and get the refined response
-final_result = orchnex.process_input(user_input)
-
-print("Final Refined Response:\n", final_result)
-```
+Here is an Example:
+[Multi-Model using Meta3.1:8b and Gemini1.5pro-exp](./meta_x_Gemini.py)
 
 ## Architecture
 
