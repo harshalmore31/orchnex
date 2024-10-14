@@ -34,7 +34,7 @@ Here is an Example:
 
 ## Architecture
 
-![Orchnex AI Architecture](assets/orchnex_architecture_diagram.png) (Include a diagram if available)
+![Orchnex AI Architecture](./assets/Architecture.jpg) (Include a diagram if available)
 
 Orchnex AI employs a unique three-agent architecture:
 
