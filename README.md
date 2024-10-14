@@ -1,33 +1,86 @@
-# Orchnex
-This project introduces a novel architecture for generative AI, employing multi-LLM agents working in concert to achieve superior accuracy, relevance, and user experience. By leveraging specialized AI agents, we overcome limitations of single-model systems, enabling the creation of more powerful and nuanced AI applications.
+# Orchnex AI (Experimental)
 
-**Introduction:**
+**Revolutionizing Generative AI Through Orchestrated Multi-Agent Collaboration**
 
-Generative AI, driven by Large Language Models (LLMs), holds immense promise across industries. However, current systems face challenges: general-purpose LLMs may lack accuracy and specialization for specific tasks, while integrating multiple LLMs can be complex for developers. This limits wider adoption and user experience.
+> **[WARNING]**
+> Orchnex AI is currently an experimental project exploring the power of multi-agent systems in generative AI. It is not intended for production use and therefore has no official support at this time. (This means we will not be reviewing PRs or issues at the moment!)
 
-**Multi-LLM Agents Architecture:**
+**Project Goals:**
 
-Our solution utilizes a unique multi-model architecture featuring three primary components:
+* Develop a multi-model LLM architecture with specialized AI agents for enhanced accuracy, relevance, and user experience.
+* Implement an iterative feedback loop between agents to refine and optimize outputs.
+* Demonstrate the effectiveness of this approach across various domains and use cases.
 
-1. **User Interface LLM (LLM-UI):** Receives user input, interprets intent, and translates it into a structured prompt tailored for a domain expert LLM.
+## Getting Started
 
-2. **Domain Expert LLM (LLM-Expert):**  Possesses specialized knowledge within a particular domain (e.g., medicine, law) and generates an initial response based on the LLM-UI's structured prompt.
+**Prerequisites:**
 
-3. **Verification and Refinement LLM (LLM-Verifier):**  Critically evaluates the initial response using chain-of-thought reasoning and self-prompts, ensuring accuracy and alignment with user expectations. It provides feedback to LLM-Expert, prompting iterative refinement. 
+* Python 3.8+
+* OpenAI API key
+* Google Generative AI API key
 
-**Iterative Refinement Process:**
+**Installation:**
 
-The interaction between LLM-Expert and LLM-Verifier is iterative. Feedback guides LLM-Expert to refine its response multiple times until it meets the desired criteria of accuracy, completeness, and relevance. This process significantly enhances the quality and trustworthiness of the final output.
+```bash
+pip install openai google-generativeai
+```
 
-**Technical Approach:**
+## Usage Example
 
-We utilize state-of-the-art machine learning frameworks and prompt engineering techniques to develop and implement this architecture. Each LLM component receives carefully crafted instructions. We address challenges related to inter-LLM communication and bias mitigation through robust design and implementation strategies.
+```python
+import orchnex_ai  # Assuming you've packaged the core logic as 'orchnex_ai'
 
-**Goals:**
+# Initialize Orchnex AI
+orchnex = orchnex_ai.OrchnexAI(
+    openai_api_key="YOUR_OPENAI_API_KEY",
+    gemini_api_key="YOUR_GEMINI_API_KEY"
+)
 
-1. Develop multi-model agents for enhanced accuracy and relevance in AI-generated outputs.
-2. Demonstrate the effectiveness of iterative refinement through LLM collaboration.
-3. Provide a foundation for building more sophisticated and specialized AI applications across various domains.
+# Get user input
+user_input = input("Enter your prompt: ")
 
-**Our multi-LLM agent orchestration approach unlocks the full power of AI, enabling innovation and creating more user-friendly and reliable AI systems.**
+# Run Orchnex AI and get the refined response
+final_result = orchnex.process_input(user_input)
 
+print("Final Refined Response:\n", final_result)
+```
+
+## Architecture
+
+![Orchnex AI Architecture](assets/orchnex_architecture_diagram.png) (Include a diagram if available)
+
+Orchnex AI employs a unique three-agent architecture:
+
+* **LLM-UI (User Interface Agent):** Receives the initial user input, interprets intent, and translates it into a structured prompt optimized for a specific domain expert. 
+* **LLM-Expert (Domain Expert Agent):** Possesses specialized knowledge in a particular domain (e.g., medicine, law, technology) and generates an initial response based on the LLM-UI's prompt.
+* **LLM-Verifier (Verification and Refinement Agent):**  Analyzes the initial response using chain-of-thought reasoning and self-prompting, ensuring accuracy and alignment with user expectations. It provides iterative feedback to LLM-Expert to refine the output.
+
+## Iterative Refinement
+
+A key feature of Orchnex AI is its iterative feedback loop. LLM-Verifier critically assesses LLM-Expert's response and provides specific, actionable feedback for improvement. LLM-Expert incorporates this feedback to generate a refined response, and the loop continues until a satisfactory output is achieved.
+
+## Potential Applications
+
+Orchnex AI's multi-agent architecture holds promise for a wide range of applications, including:
+
+* Personalized Education
+* Content Creation 
+* Customer Service
+* Scientific Research 
+* And more...
+
+## Contributing
+
+Orchnex AI is currently an experimental project. We are not accepting contributions at this time, but we appreciate your interest! 
+
+## Future Work
+
+* Implement a unified API endpoint with single API key access for greater usability.
+* Expand the range of supported domain experts and refine the iterative feedback mechanisms.
+* Explore new applications and evaluate Orchnex AI's performance on various benchmarks.
+
+## Core Contributors 
+
+* Harshal More 
+
+## License
