@@ -3,7 +3,7 @@
 **Revolutionizing Generative AI Through Orchestrated Multi-Agent Collaboration**
 
 > **[WARNING]**
-> Orchnex AI is currently an experimental project exploring the power of multi-agent systems in generative AI. It is not intended for production use and therefore has no official support at this time. (This means we will not be reviewing PRs or issues at the moment!)
+> Orchnex AI is currently an experimental project exploring the power of multi-agent systems in generative AI. It is not intended for production use and therefore has no official support at this time. 
 
 **Project Goals:**
 
@@ -26,6 +26,8 @@ pip install openai google-generativeai
 ```
 
 ## Usage Example
+
+The package isn't ready yet, consider it as an example of our project
 
 ```python
 import orchnex_ai  # Assuming you've packaged the core logic as 'orchnex_ai'
