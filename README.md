@@ -1,6 +1,6 @@
 # Orchnex AI (Experimental)
 
-**Revolutionizing Generative AI Through Orchestrated Multi-Agent Collaboration**
+**Revolutionizing Generative AI Through Orchestrated Multi-Agent Collaboration Approach**
 
 > **[WARNING]**
 > Orchnex AI is currently an experimental project exploring the power of multi-agent systems in generative AI. It is not intended for production use and therefore has no official support at this time. 
@@ -30,6 +30,33 @@ pip install openai google-generativeai
 
 The package isn't ready yet, consider it as an example of our project
 
+```py
+# Below is just representaion of the Architecture
+
+import speciic_libraries # according to selected AI
+Meta = LLM1(
+    name = "PromptMaster and Feedbacker"
+    system_instructions = "You are a PromptMaster, your role is to enhance user_input"
+)
+
+Gemini = LLM2(
+    name = "Phoenix"
+    system_instructions = "You are a AI assistant, who is good at self-prompting for better result generation, chain of thoughts"
+)
+
+LLM2 = input(result(LLM1))
+
+# Itretive Feedback Loop-1 
+
+LLM1 = input(result(LLM2))
+
+# LLM2 refine its output result by the feedback of LLM1
+# After specific iterations, then it will final show the output
+
+final_result = result(LLM2)
+
+
+```
 Here is an Example:
 
 [Multi-Model using Meta3.1:8b and Gemini1.5pro-exp](./meta_x_Gemini.py)
