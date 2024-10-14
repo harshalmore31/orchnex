@@ -18,6 +18,7 @@
 * Python 3.8+
 * OpenAI API key
 * Google Generative AI API key
+* Any other API key
 
 **Installation:**
 
@@ -30,11 +31,12 @@ pip install openai google-generativeai
 The package isn't ready yet, consider it as an example of our project
 
 Here is an Example:
+
 [Multi-Model using Meta3.1:8b and Gemini1.5pro-exp](./meta_x_Gemini.py)
 
 ## Architecture
 
-![Orchnex AI Architecture](assets/orchnex_architecture_diagram.png) (Include a diagram if available)
+![Orchnex AI Architecture](./assets/Architecture.jpg) (Include a diagram if available)
 
 Orchnex AI employs a unique three-agent architecture:
 
