@@ -1,4 +1,4 @@
-# Orchnex AI (Experimental)
+# Orchnex (Experimental)
 
 **Revolutionizing Generative AI Through Orchestrated Multi-Agent Collaboration Approach**
 
