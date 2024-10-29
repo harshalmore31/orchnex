@@ -6,7 +6,11 @@
 .DS_Store
 Thumbs.db
 
+
+
 # Node.js
+
+__pycache__/
 node_modules/
 npm-debug.log
 yarn-error.log

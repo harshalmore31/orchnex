@@ -1,20 +1,18 @@
 # src/orchnex/utils/output_manager.py
 import os
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Dict, Any
 import json
+from rich.console import Console
+from rich.panel import Panel
+from rich.text import Text
 
 class OutputManager:
     def __init__(self, base_dir: str = "outputs"):
-        """
-        Initialize OutputManager
-        
-        Args:
-            base_dir (str): Base directory for outputs
-        """
         self.base_dir = base_dir
         self.current_session: Optional[str] = None
         self.current_interaction: Optional[str] = None
+        self.console = Console()
         self._ensure_directory(self.base_dir)
 
     def start_session(self) -> str:
@@ -31,7 +29,6 @@ class OutputManager:
             self.start_session()
         
         timestamp = datetime.now().strftime("%H%M%S")
-        # Create a safe filename from the prompt
         safe_prompt = "".join(x for x in prompt[:30] if x.isalnum() or x in " -_").strip()
         safe_prompt = safe_prompt.replace(" ", "_")
         
@@ -40,50 +37,62 @@ class OutputManager:
         self._ensure_directory(interaction_dir)
         
         # Save original prompt
-        self.save_output("original_prompt.md", prompt)
-        
+        self.save_output("original_prompt.md", prompt, "Original Prompt")
         return self.current_interaction
 
-    def save_output(self, filename: str, content: str, metadata: dict = None) -> str:
-        """
-        Save output to file with optional metadata
-        
-        Args:
-            filename (str): Name of the output file
-            content (str): Content to save
-            metadata (dict, optional): Additional metadata to save
-            
-        Returns:
-            str: Path to saved file
-        """
+    def save_output(self, filename: str, content: str, step_title: str) -> str:
+        """Save output to file and display in console"""
         if not self.current_interaction:
             raise RuntimeError("No active interaction")
             
         output_dir = self._get_interaction_dir()
-        
-        # Prepare content with metadata
-        final_content = content
-        if metadata:
-            metadata_content = f"---\n{json.dumps(metadata, indent=2)}\n---\n\n"
-            final_content = metadata_content + content
-        
-        # Save file
         filepath = os.path.join(output_dir, filename)
+        
+        # Save to file
         with open(filepath, 'w', encoding='utf-8') as f:
-            f.write(final_content)
-            
+            f.write(content)
+
+        # Display in console
+        self.console.print(Panel(
+            Text(content, style="white"),
+            title=f"📝 {step_title}",
+            border_style="blue"
+        ))
+        
         return filepath
 
-    def save_summary(self, summary_data: dict) -> str:
-        """Save interaction summary"""
+    def save_iteration(self, iteration: int, feedback: str, refined_result: str) -> None:
+        """Save iteration feedback and refined result"""
+        # Save feedback
+        self.save_output(
+            f"feedback_{iteration}.md",
+            feedback,
+            f"Meta Feedback - Iteration {iteration}"
+        )
+        
+        # Save refined result
+        self.save_output(
+            f"refined_result_{iteration}.md",
+            refined_result,
+            f"Refined Result - Iteration {iteration}"
+        )
+
+    def save_summary(self, summary_data: dict) -> None:
+        """Save interaction summary as JSON"""
         if not self.current_interaction:
             raise RuntimeError("No active interaction")
             
-        summary_file = os.path.join(self._get_interaction_dir(), "summary.json")
-        with open(summary_file, 'w', encoding='utf-8') as f:
-            json.dump(summary_data, indent=2, default=str, f)
-            
-        return summary_file
+        filepath = os.path.join(self._get_interaction_dir(), "summary.json")
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(summary_data, f, indent=2)
+
+        # Display summary
+        summary_text = "\n".join(f"{k}: {v}" for k, v in summary_data.items())
+        self.console.print(Panel(
+            Text(summary_text, style="white"),
+            title="🌟 Processing Summary",
+            border_style="green"
+        ))
 
     def _get_interaction_dir(self) -> str:
         """Get current interaction directory"""
@@ -92,6 +101,6 @@ class OutputManager:
         return os.path.join(self.base_dir, self.current_session, self.current_interaction)
 
     @staticmethod
-    def _ensure_directory(directory: str) -> None:
+    def _ensure_directory(directory: str):
         """Ensure directory exists"""
         os.makedirs(directory, exist_ok=True)

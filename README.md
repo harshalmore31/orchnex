@@ -8,6 +8,17 @@
 
 Orchnex is a specialized orchestration system that combines the capabilities of Google's Gemini and Meta's Llama models. This Phase 1 release focuses on optimizing the interaction between these two powerful LLMs to provide enhanced results through prompt refinement and quality control.
 
+<details>
+    <summary>🔽 Orchnex Output</summary>
+
+|System Initialization![s1](./assets/s1.png)|Enhanced Prompt![s2](./assets/s2.png)|
+|--|--|
+|Inital Response![s3](./assets/s3.png)|Meta Feedback-1![s4](./assets/s4.png)|
+|Refined Response-1![s5](./assets/s5.png)|Meta Feedback-2![s6](./assets/s6.png)|
+|Refined Response-2![s7](./assets/s7.png)|Final Result![s8](./assets/s8.png)|
+
+</details>
+
 ## How to Setup
 
 ### Requirements 
