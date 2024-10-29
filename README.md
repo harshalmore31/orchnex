@@ -80,6 +80,9 @@ pip install openai
 ## Orchnex In Action
 
 
+#### Orchnex Architecture![orchnex_flowchart](./assets/F-orchnex.png)
+*flowchart of orchnex of gemini and llama*
+
 ## Key Features
 
 - 🤖 **Dual-LLM Orchestration**: Seamless coordination between Gemini and Llama
