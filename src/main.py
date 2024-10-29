@@ -1,56 +1,212 @@
-# src/demo.py
 from rich.console import Console
 from rich.prompt import Prompt
+from rich.panel import Panel
+from rich.table import Table
+from rich.progress import Progress, SpinnerColumn, TextColumn
 from orchnex import LLMConfig, MultiLLMOrchestrator
 import os
+from datetime import datetime
+import time
+
+class OrchnexDemo:
+    def __init__(self):
+        self.console = Console()
+        self.orchestrator = None
+        self.initialize_system()
+    
+    def display_header(self):
+        header = """
+╔══════════════════════════════════════════════════════╗
+║                   🌟 ORCHNEX DEMO 🌟                 ║
+║            Multi-LLM Orchestration Platform          ║
+╚══════════════════════════════════════════════════════╝
+        """
+        self.console.print(Panel(header, style="bold blue"))
+
+    def display_capabilities(self):
+        capabilities_table = Table(show_header=True, header_style="bold magenta")
+        capabilities_table.add_column("Category", style="cyan")
+        capabilities_table.add_column("Capabilities", style="green")
+
+        capabilities = {
+            "Prompt Processing": [
+                "✨ Advanced Prompt Enhancement",
+                "🎯 Context-Aware Processing",
+                "🔍 Intelligent Analysis",
+            ],
+            "LLM Integration": [
+                "🤖 Multi-LLM Orchestration",
+                "🔄 Dynamic Model Selection",
+                "⚡ Parallel Processing",
+            ],
+            "Quality Control": [
+                "📊 Automated Quality Analysis",
+                "🔄 Iterative Refinement",
+                "✅ Validation Checks",
+            ]
+        }
+
+        for category, caps in capabilities.items():
+            capabilities_table.add_row(category, "\n".join(caps))
+
+        self.console.print("\n🔥 System Capabilities:", style="bold yellow")
+        self.console.print(capabilities_table)
+
+    def initialize_system(self):
+        # Get API keys
+        gemini_key = os.getenv("GEMINI_API_KEY")
+        nvidia_key = os.getenv("NVIDIA_API_KEY")
+
+        if not gemini_key:
+            gemini_key = Prompt.ask("Enter GEMINI_API_KEY")
+        if not nvidia_key:
+            nvidia_key = Prompt.ask("Enter NVIDIA_API_KEY")
+
+            with Progress(
+                SpinnerColumn(),
+                TextColumn("[progress.description]{task.description}"),
+            transient=True,
+            ) as progress:
+                task = progress.add_task("🚀 Initializing Orchnex system...", total=None)
+            
+            config = LLMConfig(
+                gemini_api_key=gemini_key,
+                nvidia_api_key=nvidia_key
+            )
+            
+            self.orchestrator = MultiLLMOrchestrator(config)
+            time.sleep(1)  # Give a sense of initialization
+            
+            progress.update(task, completed=True)
+
+        self.console.print("\n✅ System initialized successfully!", style="bold green")
+        
+    def process_prompt(self, prompt: str):
+        try:
+            self.console.print("\n🎯 Processing Prompt:", style="bold cyan")
+            self.console.print(f"{prompt}\n")
+
+            # Step 1: Prompt Analysis and Enhancement
+            with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}")) as progress:
+                task = progress.add_task("🔍 Step 1: Analyzing prompt with PromptMaster 3.0...", total=1)
+                enhanced_prompt = self.orchestrator.enhance_prompt_with_promptmaster(prompt)
+                progress.update(task, completed=1)
+            
+            self.console.print(Panel(
+                f"Enhanced Prompt:\n{enhanced_prompt}",
+                title="Step 1 Result",
+                style="blue"
+            ))
+
+            # Step 2: Initial Generation with Gemini
+            with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}")) as progress:
+                task = progress.add_task("🤖 Step 2: Generating initial response with Gemini...", total=1)
+                initial_result = self.orchestrator.providers['gemini'].generate_response(enhanced_prompt)
+                progress.update(task, completed=1)
+
+            self.console.print(Panel(
+                f"Initial Response:\n{initial_result}",
+                title="Step 2 Result",
+                style="blue"
+            ))
+
+            current_result = initial_result
+
+            # Step 3: Iterative Feedback Loop
+            for iteration in range(self.orchestrator.config.max_iterations):
+                # Meta Feedback
+                with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}")) as progress:
+                    task = progress.add_task(f"🔄 Step {3+iteration*2}: Meta Feedback Loop - {iteration+1}...", total=1)
+                    feedback = self.orchestrator.providers['llama'].generate_response(
+                        f"Analyze this response for improvements:\n{current_result}"
+                    )
+                    progress.update(task, completed=1)
+
+                self.console.print(Panel(
+                    f"Meta Feedback:\n{feedback}",
+                    title=f"Step {3+iteration*2} Result",
+                    style="blue"
+                ))
+
+                # Skip refinement if feedback suggests termination
+                if "TERMINATE" in feedback.upper():
+                    break
+
+                # Gemini Refinement
+                with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}")) as progress:
+                    task = progress.add_task(f"✨ Step {4+iteration*2}: Refining with Gemini...", total=1)
+                    current_result = self.orchestrator.providers['gemini'].generate_response(
+                        f"Refine based on feedback:\n{feedback}\n\nPrevious response:\n{current_result}"
+                    )
+                    progress.update(task, completed=1)
+
+                self.console.print(Panel(
+                    f"Refined Response:\n{current_result}",
+                    title=f"Step {4+iteration*2} Result",
+                    style="blue"
+                ))
+
+            # Final Results
+            final_panel = Panel(
+                f"""
+    🎯 Original Prompt:
+    {prompt}
+
+    📝 Enhanced Prompt:
+    {enhanced_prompt}
+
+    📊 Final Result:
+    {current_result}
+                """,
+                title="🌟 Final Processing Results",
+                style="green"
+            )
+            self.console.print("\n")
+            self.console.print(final_panel)
+
+            return current_result
+
+        except Exception as e:
+            error_panel = Panel(
+                f"❌ Error during processing: {str(e)}",
+                title="Error",
+                style="bold red"
+            )
+            self.console.print(error_panel)
+            return None
+    
+    def run(self):
+        try:
+            # Setup
+            self.display_header()
+            self.display_capabilities()
+
+            # Main interaction loop
+            while True:
+                self.console.print("\n" + "─" * 80)
+                prompt = Prompt.ask("\n💭 Enter your prompt (or 'quit' to exit)")
+
+                if prompt.lower() == 'quit':
+                    break
+
+                self.process_prompt(prompt)
+
+                continue_prompt = Prompt.ask("\n🤔 Would you like to try another prompt? (y/n)", choices=["y", "n"], default="y")
+
+                if continue_prompt.lower() != 'y':
+                    break
+
+            # Closing message
+            self.console.print("\n👋 Thank you for using Orchnex Demo!", style="bold blue")
+
+        except KeyboardInterrupt:
+            self.console.print("\n\n❌ Demo interrupted by user", style="bold red")
+        except Exception as e:
+            self.console.print(f"\n❌ Fatal Error: {str(e)}", style="bold red")
 
 def run_interactive_demo():
-    console = Console()
-    
-    # ASCII Art Header
-    console.print("""
-    ╔═══════════════════════════════════════════╗
-    ║            🌟 ORCHNEX DEMO 🌟             ║
-    ║    Multi-LLM Orchestration Platform       ║
-    ╚═══════════════════════════════════════════╝
-    """, style="bold blue")
-    
-    # Initialize configuration
-    config = LLMConfig(
-        gemini_api_key=os.getenv("GEMINI_API_KEY") or input("Enter GEMINI_API_KEY : "),
-        nvidia_api_key=os.getenv("NVIDIA_API_KEY") or input("Enter NVIDIA_API_KEY : ")
-    )
-    
-    orchestrator = MultiLLMOrchestrator(config)
-    
-    # Show capabilities
-    console.print("\n🔥 Available Capabilities:", style="bold yellow")
-    capabilities = [
-        "✨ Prompt Enhancement via PromptMaster 3.0",
-        "🤖 Multi-LLM Processing Pipeline",
-        "📊 Quality Analysis and Refinement",
-        "🔄 Iterative Improvement Loop",
-        "📈 Performance Metrics"
-    ]
-    for cap in capabilities:
-        console.print(f"  {cap}")
-    
-    # Interactive demo
-    while True:
-        try:
-            prompt = Prompt.ask("\n\n💭 Enter your prompt (or 'quit' to exit)")
-            
-            if prompt.lower() == 'quit':
-                break
-                
-            console.print("\n🎯 Processing your request through the orchestration pipeline...\n")
-            result = orchestrator.process_input(prompt, verbose=True)
-            
-        except KeyboardInterrupt:
-            console.print("\n\n❌ Demo interrupted by user")
-            break
-        except Exception as e:
-            console.print(f"\n❌ Error: {str(e)}", style="bold red")
+    demo = OrchnexDemo()
+    demo.run()
 
 if __name__ == "__main__":
     run_interactive_demo()

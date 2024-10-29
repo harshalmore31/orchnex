@@ -5,12 +5,14 @@ from .templates import PromptTemplates
 from .providers.base import LLMProvider
 from .providers.llama_provider import LlamaProvider
 from .providers.gemini_provider import GeminiProvider
+from .output_manager import OutputManager
 
 class MultiLLMOrchestrator:
     def __init__(self, config: LLMConfig):
         self.config = config
         self.templates = PromptTemplates()
         self.providers: Dict[str, LLMProvider] = {}
+        self.output_manager = OutputManager()
         self._initialize_providers()
 
     def _initialize_providers(self):
@@ -61,50 +63,64 @@ class MultiLLMOrchestrator:
             temperature=0.2
         )
 
-    def process_input(self, user_input: str, verbose: bool = False) -> str:
+# In your orchestrator's process_input method:
+    def process_input(self, prompt: str, verbose: bool = False) -> str:
         """Process user input through the multi-LLM pipeline"""
+        # Start new interaction
+        self.output_manager.start_interaction(prompt)
+        
         try:
             # 1. Enhance prompt
-            enhanced_prompt = self.enhance_prompt_with_promptmaster(user_input)
-            if verbose:
-                print(f"\nEnhanced Prompt:\n{enhanced_prompt}\n")
+            enhanced_prompt = self.enhance_prompt_with_promptmaster(prompt)
+            self.output_manager.save_step_output(
+                "enhanced_prompt",
+                enhanced_prompt,
+                "Enhanced Prompt"
+            )
 
             # 2. Generate initial response
             initial_result = self.providers['gemini'].generate_response(enhanced_prompt)
-            if verbose:
-                print(f"Initial Result:\n{initial_result}\n")
+            self.output_manager.save_step_output(
+                "initial_response",
+                initial_result,
+                "Initial Gemini Response"
+            )
 
             current_result = initial_result
             
             # 3. Iterative feedback loop
             for iteration in range(self.config.max_iterations):
-                # Get feedback using template
-                feedback_prompt = self.templates.get_feedback_template().format(
-                    user_input=user_input,
-                    enhanced_prompt=enhanced_prompt,
-                    current_result=current_result
+                feedback = self.providers['llama'].generate_response(
+                    f"Analyze this response for improvements:\n{current_result}"
                 )
                 
-                feedback = self.providers['llama'].generate_response(feedback_prompt)
-                
-                if verbose:
-                    print(f"\nIteration {iteration + 1} Feedback:\n{feedback}\n")
-
-                if feedback.strip().upper() == "TERMINATE":
+                if "TERMINATE" in feedback.upper():
                     break
 
-                # Refine response using template
-                refinement_prompt = self.templates.get_refinement_template().format(
-                    previous_response=current_result,
-                    feedback=feedback
+                current_result = self.providers['gemini'].generate_response(
+                    f"Refine based on feedback:\n{feedback}\n\nPrevious response:\n{current_result}"
                 )
                 
-                current_result = self.providers['gemini'].generate_response(refinement_prompt)
-                
-                if verbose:
-                    print(f"Refined Result (Iteration {iteration + 1}):\n{current_result}\n")
+                self.output_manager.save_iteration_output(
+                    iteration + 1,
+                    feedback,
+                    current_result
+                )
+
+            # Save final summary
+            self.output_manager.save_final_summary(
+                prompt,
+                enhanced_prompt,
+                current_result
+            )
 
             return current_result
-            
+
         except Exception as e:
-            raise RuntimeError(f"Error processing input: {str(e)}")
+            error_msg = f"Error in processing input: {str(e)}"
+            self.output_manager.save_step_output(
+                "error",
+                error_msg,
+                "Error"
+            )
+            raise RuntimeError(error_msg)
