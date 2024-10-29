@@ -1,0 +1,53 @@
+# Logs
+*.log
+*.env
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Markdown
+*.CODE_OF_CONDUCT.md
+
+# Java
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+
+# Ruby
+*.gem
+*.rbc
+.ruby-version
+.ruby-gemset
+
+# Go
+*.exe
+*.out
+*.test
+
+# Rust
+target/
+
+# C/C++
+*.obj
+*.o
+*.a
+*.lib
+*.so
+*.dll
+*.dylib
+*.exe
+*.out
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+*.7z
