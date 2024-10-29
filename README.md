@@ -66,6 +66,9 @@ pip install openai
 7. Enter the saved API keys
 8. Enter the prompt, go throught the whole flow, to view the interaction within two LLM
 
+## Orchnex In Action
+
+
 ## Key Features
 
 - 🤖 **Dual-LLM Orchestration**: Seamless coordination between Gemini and Llama

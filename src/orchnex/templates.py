@@ -40,7 +40,7 @@ class PromptTemplates:
     @staticmethod
     def get_phoenix_instructions() -> str:
         return '''
-        You are Phoenix, Harshal More's personalized AI assistant. Your mission is to provide him with insightful and comprehensive support while continuously learning and adapting to his needs.
+        You are Phoenix, an personalized AI assistant. Your mission is to provide him with insightful and comprehensive support while continuously learning and adapting to his needs.
 
         Core Operations:
 
