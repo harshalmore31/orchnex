@@ -5,21 +5,16 @@ from typing import Optional, Dict, Any
 import json
 from rich.console import Console
 from rich.panel import Panel
+from rich.text import Text
 
 class OutputManager:
     def __init__(self, base_dir: str = "outputs"):
-        """
-        Initialize OutputManager
-        
-        Args:
-            base_dir (str): Base directory for outputs
-        """
         self.base_dir = base_dir
         self.current_session: Optional[str] = None
         self.current_interaction: Optional[str] = None
         self.console = Console()
         self._ensure_directory(self.base_dir)
-        
+
     def start_session(self) -> str:
         """Start a new session with timestamp"""
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -41,88 +36,63 @@ class OutputManager:
         interaction_dir = self._get_interaction_dir()
         self._ensure_directory(interaction_dir)
         
-        # Save and display original prompt
-        self.save_step_output("original_prompt", prompt, "Original Prompt")
+        # Save original prompt
+        self.save_output("original_prompt.md", prompt, "Original Prompt")
         return self.current_interaction
 
-    def save_step_output(self, step_name: str, content: str, display_title: str, metadata: Dict[str, Any] = None) -> str:
-        """
-        Save and display step output
-        
-        Args:
-            step_name (str): Name of the step
-            content (str): Content to save
-            display_title (str): Title for display panel
-            metadata (dict, optional): Additional metadata
-        """
+    def save_output(self, filename: str, content: str, step_title: str) -> str:
+        """Save output to file and display in console"""
         if not self.current_interaction:
             raise RuntimeError("No active interaction")
             
-        # Save to file
         output_dir = self._get_interaction_dir()
-        timestamp = datetime.now().isoformat()
+        filepath = os.path.join(output_dir, filename)
         
-        # Prepare content with metadata
-        full_content = f"""Timestamp: {timestamp}
-Step: {step_name}
-
-{content}"""
-
-        if metadata:
-            metadata_content = "\nMetadata:\n" + "\n".join(f"{k}: {v}" for k, v in metadata.items())
-            full_content += metadata_content
-
-        filepath = os.path.join(output_dir, f"{step_name}.md")
+        # Save to file
         with open(filepath, 'w', encoding='utf-8') as f:
-            f.write(full_content)
+            f.write(content)
 
         # Display in console
         self.console.print(Panel(
-            content,
-            title=f"📝 {display_title}",
-            style="blue"
+            Text(content, style="white"),
+            title=f"📝 {step_title}",
+            border_style="blue"
         ))
         
         return filepath
 
-    def save_iteration_output(self, iteration: int, feedback: str, refined_response: str) -> None:
-        """Save iteration output with feedback and refinement"""
+    def save_iteration(self, iteration: int, feedback: str, refined_result: str) -> None:
+        """Save iteration feedback and refined result"""
         # Save feedback
-        self.save_step_output(
-            f"iteration_{iteration}_feedback",
+        self.save_output(
+            f"feedback_{iteration}.md",
             feedback,
-            f"Meta Feedback - Iteration {iteration}",
-            {"iteration": iteration}
+            f"Meta Feedback - Iteration {iteration}"
         )
         
-        # Save refined response
-        self.save_step_output(
-            f"iteration_{iteration}_refinement",
-            refined_response,
-            f"Refined Response - Iteration {iteration}",
-            {"iteration": iteration}
+        # Save refined result
+        self.save_output(
+            f"refined_result_{iteration}.md",
+            refined_result,
+            f"Refined Result - Iteration {iteration}"
         )
 
-    def save_final_summary(self, original_prompt: str, enhanced_prompt: str, final_result: str) -> None:
-        """Save and display final summary"""
-        summary_content = f"""Original Prompt:
-{original_prompt}
+    def save_summary(self, summary_data: dict) -> None:
+        """Save interaction summary as JSON"""
+        if not self.current_interaction:
+            raise RuntimeError("No active interaction")
+            
+        filepath = os.path.join(self._get_interaction_dir(), "summary.json")
+        with open(filepath, 'w', encoding='utf-8') as f:
+            json.dump(summary_data, f, indent=2)
 
-Enhanced Prompt:
-{enhanced_prompt}
-
-Final Result:
-{final_result}"""
-
-        self.save_step_output(
-            "final_summary",
-            summary_content,
-            "🌟 Final Processing Results",
-            {
-                "timestamp": datetime.now().isoformat(),
-                "processing_complete": True
-            }
-        )
+        # Display summary
+        summary_text = "\n".join(f"{k}: {v}" for k, v in summary_data.items())
+        self.console.print(Panel(
+            Text(summary_text, style="white"),
+            title="🌟 Processing Summary",
+            border_style="green"
+        ))
 
     def _get_interaction_dir(self) -> str:
         """Get current interaction directory"""

@@ -86,17 +86,21 @@ class OrchnexDemo:
             self.console.print("\n🎯 Processing Prompt:", style="bold cyan")
             self.console.print(f"{prompt}\n")
 
+            # Initialize interaction in output manager
+            self.orchestrator.output_manager.start_interaction(prompt)
+
             # Step 1: Prompt Analysis and Enhancement
             with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}")) as progress:
                 task = progress.add_task("🔍 Step 1: Analyzing prompt with PromptMaster 3.0...", total=1)
                 enhanced_prompt = self.orchestrator.enhance_prompt_with_promptmaster(prompt)
                 progress.update(task, completed=1)
             
-            self.console.print(Panel(
-                f"Enhanced Prompt:\n{enhanced_prompt}",
-                title="Step 1 Result",
-                style="blue"
-            ))
+            # Save and display enhanced prompt
+            self.orchestrator.output_manager.save_output(
+                "enhanced_prompt.md",
+                enhanced_prompt,
+                "Enhanced Prompt"
+            )
 
             # Step 2: Initial Generation with Gemini
             with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}")) as progress:
@@ -104,11 +108,12 @@ class OrchnexDemo:
                 initial_result = self.orchestrator.providers['gemini'].generate_response(enhanced_prompt)
                 progress.update(task, completed=1)
 
-            self.console.print(Panel(
-                f"Initial Response:\n{initial_result}",
-                title="Step 2 Result",
-                style="blue"
-            ))
+            # Save and display initial result
+            self.orchestrator.output_manager.save_output(
+                "initial_result.md",
+                initial_result,
+                "Initial Response"
+            )
 
             current_result = initial_result
 
@@ -122,11 +127,12 @@ class OrchnexDemo:
                     )
                     progress.update(task, completed=1)
 
-                self.console.print(Panel(
-                    f"Meta Feedback:\n{feedback}",
-                    title=f"Step {3+iteration*2} Result",
-                    style="blue"
-                ))
+                # Save feedback
+                self.orchestrator.output_manager.save_output(
+                    f"feedback_{iteration+1}.md",
+                    feedback,
+                    f"Meta Feedback - Iteration {iteration+1}"
+                )
 
                 # Skip refinement if feedback suggests termination
                 if "TERMINATE" in feedback.upper():
@@ -140,13 +146,24 @@ class OrchnexDemo:
                     )
                     progress.update(task, completed=1)
 
-                self.console.print(Panel(
-                    f"Refined Response:\n{current_result}",
-                    title=f"Step {4+iteration*2} Result",
-                    style="blue"
-                ))
+                # Save refined result
+                self.orchestrator.output_manager.save_output(
+                    f"refined_result_{iteration+1}.md",
+                    current_result,
+                    f"Refined Response - Iteration {iteration+1}"
+                )
 
-            # Final Results
+            # Save final summary
+            summary_data = {
+                "timestamp": datetime.now().isoformat(),
+                "original_prompt": prompt,
+                "enhanced_prompt": enhanced_prompt,
+                "final_result": current_result,
+                "iterations_completed": iteration + 1
+            }
+            self.orchestrator.output_manager.save_summary(summary_data)
+
+            # Display final results panel
             final_panel = Panel(
                 f"""
     🎯 Original Prompt:
@@ -173,6 +190,13 @@ class OrchnexDemo:
                 style="bold red"
             )
             self.console.print(error_panel)
+            
+            # Save error to output manager
+            self.orchestrator.output_manager.save_output(
+                "error.md",
+                str(e),
+                "Error"
+            )
             return None
     
     def run(self):
