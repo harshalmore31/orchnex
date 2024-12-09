@@ -5,9 +5,9 @@
 # OS generated files
 .DS_Store
 Thumbs.db
-
-
-
+outputs
+.gradio
+src\outputs
 # Node.js
 
 __pycache__/

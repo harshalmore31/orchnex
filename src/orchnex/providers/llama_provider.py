@@ -11,7 +11,7 @@ class LlamaProvider(LLMProvider):
         self.default_params = {
             "temperature": 0.7,
             "top_p": 0.95,
-            "max_tokens": 1024
+            "max_tokens": 10240
         }
 
     def initialize(self, api_key: str, **kwargs):
