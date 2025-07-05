@@ -108,6 +108,7 @@ result = orchestrator.process_input(
 print(result)
 ```
 
+#### Orchnex Architecture![orchnex_flowchart](./assets/F-orchnex.png)
 
 
 

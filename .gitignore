@@ -5,9 +5,12 @@
 # OS generated files
 .DS_Store
 Thumbs.db
-outputs
-.gradio
-src\outputs
+
+/src/build/
+.cache/
+
+dist/
+
 # Node.js
 
 __pycache__/
@@ -55,3 +58,5 @@ target/
 *.tar.gz
 *.rar
 *.7z
+
+src/build/
